@@ -30,9 +30,7 @@
                 <a href="#contact">Contact</a>
             </nav>
 
-            <a href="#appointment" class="nav-button">
-                Book Appointment
-            </a>
+            
 
         </div>
     </header>
@@ -61,9 +59,9 @@
                 </p>
 
                 <div class="hero-buttons">
-                    <a href="#appointment" class="primary-button">
-                        Book an Appointment
-                    </a>
+                    <a href="{{ url_for('appointment') }}" class="primary-button">
+    Book an Appointment
+</a>
 
                     <a href="#services" class="secondary-button">
                         Explore Services
@@ -137,9 +135,9 @@
                 Book your next self-care experience with us.
             </p>
 
-            <a href="#contact" class="primary-button">
-                Book an Appointment
-            </a>
+            <a href="{{ url_for('appointment') }}" class="primary-button">
+    Book an Appointment
+</a>
 
         </section>
 

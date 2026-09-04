@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Edit Service | GlowNest</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+<body class="admin-body">
+
+    <header class="admin-header">
+
+        <div class="admin-brand">
+            <h1>GlowNest</h1>
+            <span>Admin Dashboard</span>
+        </div>
+
+        <div class="admin-user">
+
+            <span>
+                Welcome, {{ current_user.username }}
+            </span>
+
+            <a href="{{ url_for('admin_logout') }}">
+                Logout
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <div class="admin-layout">
+
+        <aside class="admin-sidebar">
+
+            <nav>
+
+                <a href="{{ url_for('admin_dashboard') }}">
+                    Dashboard
+                </a>
+
+                <a
+                    href="{{ url_for('admin_services') }}"
+                    class="active"
+                >
+                    Services
+                </a>
+
+                <a href="#">
+                    Appointments
+                </a>
+
+                <a href="#">
+                    Customers
+                </a>
+
+                <a href="#">
+                    Inquiries
+                </a>
+
+                <a href="#">
+                    Settings
+                </a>
+
+            </nav>
+
+        </aside>
+
+
+        <main class="admin-content">
+
+            <div class="dashboard-heading">
+
+                <p class="eyebrow">
+                    BUSINESS
+                </p>
+
+                <h2>Edit Service</h2>
+
+                <p>
+                    Update the details of this service.
+                </p>
+
+            </div>
+
+
+            <section class="form-card">
+
+                <form
+                    method="POST"
+                    class="admin-form"
+                >
+                <input
+        type="hidden"
+        name="csrf_token"
+        value="{{ csrf_token() }}"
+    >
+
+                    <div class="form-group">
+
+                        <label for="name">
+                            Service Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            value="{{ service.name }}"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="description">
+                            Description
+                        </label>
+
+                        <textarea
+                            id="description"
+                            name="description"
+                            rows="4"
+                        >{{ service.description or "" }}</textarea>
+
+                    </div>
+
+
+                    <div class="form-row">
+
+                        <div class="form-group">
+
+                            <label for="price">
+                                Price (₹)
+                            </label>
+
+                            <input
+                                type="number"
+                                id="price"
+                                name="price"
+                                min="0"
+                                step="0.01"
+                                value="{{ service.price }}"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="duration">
+                                Duration (minutes)
+                            </label>
+
+                            <input
+                                type="number"
+                                id="duration"
+                                name="duration"
+                                min="1"
+                                value="{{ service.duration }}"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-actions">
+
+                        <a
+                            href="{{ url_for('admin_services') }}"
+                            class="secondary-button"
+                        >
+                            Cancel
+                        </a>
+
+                        <button
+                            type="submit"
+                            class="primary-button"
+                        >
+                            Save Changes
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </section>
+
+        </main>
+
+    </div>
+
+</body>
+
+</html>

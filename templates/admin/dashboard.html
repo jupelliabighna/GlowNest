@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Dashboard | GlowNest</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+<body class="admin-body">
+
+    <!-- Admin Header -->
+
+    <header class="admin-header">
+
+        <div class="admin-brand">
+            <h1>GlowNest</h1>
+            <span>Admin Dashboard</span>
+        </div>
+
+        <div class="admin-user">
+
+            <span>
+                Welcome, {{ current_user.username }}
+            </span>
+
+            <a href="{{ url_for('admin_logout') }}">
+                Logout
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <!-- Admin Layout -->
+
+    <div class="admin-layout">
+
+
+        <!-- Sidebar -->
+
+        <aside class="admin-sidebar">
+
+            <nav>
+
+                <a href="{{ url_for('admin_dashboard') }}"
+                   class="active">
+                    Dashboard
+                </a>
+
+                <a href="#">
+                    Appointments
+                </a>
+
+                <a href="{{ url_for('admin_services') }}">
+    Services
+</a>
+
+                <a href="#">
+                    Customers
+                </a>
+
+                <a href="#">
+                    Inquiries
+                </a>
+
+                <a href="#">
+                    Settings
+                </a>
+
+            </nav>
+
+        </aside>
+
+
+        <!-- Main Content -->
+
+        <main class="admin-content">
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+
+    {% if messages %}
+
+        <div class="flash-messages">
+
+            {% for category, message in messages %}
+
+                <div class="flash-message flash-{{ category }}">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+{% endwith %}
+
+            <div class="dashboard-heading">
+
+                <div>
+                    <p class="eyebrow">
+                        OVERVIEW
+                    </p>
+
+                    <h2>Dashboard</h2>
+
+                    <p>
+                        Hey, Welcome back.........!
+                    </p>
+                </div>
+
+            </div>
+
+            <section class="dashboard-stats">
+
+    <div class="stat-card">
+
+        <div class="stat-card-label">
+            Total Appointments
+        </div>
+
+        <div class="stat-card-value">
+            {{ total_appointments }}
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-card-label">
+            Pending
+        </div>
+
+        <div class="stat-card-value">
+            {{ pending_appointments }}
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-card-label">
+            Confirmed
+        </div>
+
+        <div class="stat-card-value">
+            {{ confirmed_appointments }}
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-card-label">
+            Completed
+        </div>
+
+        <div class="stat-card-value">
+            {{ completed_appointments }}
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-card-label">
+            Cancelled
+        </div>
+
+        <div class="stat-card-value">
+            {{ cancelled_appointments }}
+        </div>
+
+    </div>
+
+</section>
+
+<form
+    method="GET"
+    action="{{ url_for('admin_dashboard') }}"
+    class="appointment-search"
+>
+
+    <input
+        type="text"
+        name="search"
+        value="{{ request.args.get('search', '') }}"
+        placeholder="Search by name, email or phone"
+    >
+
+    <input
+        type="date"
+        name="date"
+        value="{{ request.args.get('date', '') }}"
+        class="date-filter"
+    >
+
+    {% if request.args.get('status') %}
+        <input
+            type="hidden"
+            name="status"
+            value="{{ request.args.get('status') }}"
+        >
+    {% endif %}
+
+    <button
+        type="submit"
+        class="search-button"
+    >
+        Search
+    </button>
+
+    {% if request.args.get('search') or request.args.get('date') %}
+        <a
+            href="{{ url_for('admin_dashboard') }}"
+            class="clear-search"
+        >
+            Clear
+        </a>
+    {% endif %}
+
+</form>
+
+<div class="appointment-filters">
+
+    <a
+        href="{{ url_for('admin_dashboard') }}"
+        class="filter-button {% if not request.args.get('status') %}active{% endif %}"
+    >
+        All
+    </a>
+
+    <a
+        href="{{ url_for('admin_dashboard', status='Pending') }}"
+        class="filter-button {% if request.args.get('status') == 'Pending' %}active{% endif %}"
+    >
+        Pending
+    </a>
+
+    <a
+        href="{{ url_for('admin_dashboard', status='Confirmed') }}"
+        class="filter-button {% if request.args.get('status') == 'Confirmed' %}active{% endif %}"
+    >
+        Confirmed
+    </a>
+
+    <a
+        href="{{ url_for('admin_dashboard', status='Completed') }}"
+        class="filter-button {% if request.args.get('status') == 'Completed' %}active{% endif %}"
+    >
+        Completed
+    </a>
+
+    <a
+        href="{{ url_for('admin_dashboard', status='Cancelled') }}"
+        class="filter-button {% if request.args.get('status') == 'Cancelled' %}active{% endif %}"
+    >
+        Cancelled
+    </a>
+
+</div>
+            <!-- Appointments -->
+
+            <section class="dashboard-section">
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <p class="eyebrow">
+                            BOOKINGS
+                        </p>
+
+                        <h3>
+                            Recent Appointments
+                        </h3>
+
+                    </div>
+
+                </div>
+
+
+                {% if appointments %}
+
+                    <div class="admin-table-wrapper">
+
+                        <table class="admin-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>ID</th>
+
+                                    <th>Customer</th>
+
+                                    <th>Service</th>
+
+                                    <th>Date</th>
+
+                                    <th>Time</th>
+
+                                    <th>Status</th>
+
+                                    <th>Action</th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+                                {% for appointment in appointments %}
+
+                                    <tr>
+
+                                        <td>
+                                            #{{ appointment.id }}
+                                        </td>
+
+                                        <td>
+                                            <strong>
+                                                {{ appointment.name }}
+                                            </strong>
+
+                                            <small>
+                                                {{ appointment.email }}
+                                            </small>
+                                        </td>
+
+                                        <td>
+                                            {{ appointment.service }}
+                                        </td>
+
+                                        <td>
+                                            {{ appointment.date }}
+                                        </td>
+
+                                        <td>
+                                            {{ appointment.time }}
+                                        </td>
+
+                                        <td>
+
+    <span class="status-badge status-{{ appointment.status|lower }}">
+        {{ appointment.status }}
+    </span>
+
+</td>
+
+<td>
+
+    {% if appointment.status == "Pending" %}
+
+        <form
+            method="POST"
+            action="{{ url_for(
+                'update_appointment_status',
+                appointment_id=appointment.id
+            ) }}"
+            class="status-form"
+        >
+        <input
+        type="hidden"
+        name="csrf_token"
+        value="{{ csrf_token() }}"
+    >
+
+            <input
+                type="hidden"
+                name="status"
+                value="Confirmed"
+            >
+
+            <button
+                type="submit"
+                class="action-button confirm-button"
+            >
+                Confirm
+            </button>
+
+        </form>
+
+
+        <form
+            method="POST"
+            action="{{ url_for(
+                'update_appointment_status',
+                appointment_id=appointment.id
+            ) }}"
+            class="status-form"
+        >
+        <input
+        type="hidden"
+        name="csrf_token"
+        value="{{ csrf_token() }}"
+    >
+
+            <input
+                type="hidden"
+                name="status"
+                value="Cancelled"
+            >
+
+            <button
+                type="submit"
+                class="action-button cancel-button"
+            >
+                Cancel
+            </button>
+
+        </form>
+
+
+    {% elif appointment.status == "Confirmed" %}
+
+        <form
+            method="POST"
+            action="{{ url_for(
+                'update_appointment_status',
+                appointment_id=appointment.id
+            ) }}"
+            class="status-form"
+        >
+        <input
+        type="hidden"
+        name="csrf_token"
+        value="{{ csrf_token() }}"
+    >
+
+            <input
+                type="hidden"
+                name="status"
+                value="Completed"
+            >
+
+            <button
+                type="submit"
+                class="action-button complete-button"
+            >
+                Complete
+            </button>
+
+        </form>
+
+
+        <form
+            method="POST"
+            action="{{ url_for(
+                'update_appointment_status',
+                appointment_id=appointment.id
+            ) }}"
+            class="status-form"
+        >
+        <input
+        type="hidden"
+        name="csrf_token"
+        value="{{ csrf_token() }}"
+    >
+
+            <input
+                type="hidden"
+                name="status"
+                value="Cancelled"
+            >
+
+            <button
+                type="submit"
+                class="action-button cancel-button"
+            >
+                Cancel
+            </button>
+
+        </form>
+
+
+    {% else %}
+
+        <span class="no-action">
+            —
+        </span>
+
+    {% endif %}
+
+</td>
+
+                                    </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="empty-state">
+
+                        <h3>
+                            No appointments yet
+                        </h3>
+
+                        <p>
+                            Customer bookings will appear here.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </section>
+
+        </main>
+
+    </div>
+
+</body>
+
+</html>

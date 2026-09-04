@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Book an Appointment | GlowNest</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+<body>
+
+    <header class="navbar">
+
+        <div class="nav-container">
+
+            <a href="/" class="logo">
+                GlowNest
+            </a>
+
+            <nav>
+                <a href="/">Home</a>
+                <a href="/#about">About</a>
+                <a href="/#services">Services</a>
+                <a href="/#testimonials">Testimonials</a>
+            </nav>
+
+        </div>
+
+    </header>
+
+
+    <main>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+    {% if messages %}
+
+        <div class="flash-messages">
+
+            {% for category, message in messages %}
+
+                <div class="flash-message flash-{{ category }}">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+{% endwith %}
+
+        <section class="appointment-page">
+
+            <h1>Book Your Appointment</h1>
+
+            <p>
+                Tell us when you'd like to visit GlowNest.
+            </p>
+
+
+            <form
+    method="POST"
+    action="{{ url_for('appointment') }}"
+    class="appointment-form"
+>
+
+    <input
+        type="hidden"
+        name="csrf_token"
+        value="{{ csrf_token() }}"
+    >
+
+
+                <label for="name">
+                    Full Name
+                </label>
+
+                <input
+    type="text"
+    id="name"
+    name="name"
+    value="{{ name }}"
+
+                    placeholder="Enter your Name"
+                    required
+                >
+                <small class="field-error" id="name-error"></small>
+
+
+                <label for="email">
+                    Email
+                </label>
+
+               <input
+    type="email"
+    id="email"
+    name="email"
+    value="{{ email }}"
+                    placeholder="Enter the email address"
+                    required
+                >
+                <small class="field-error" id="email-error"></small>
+
+
+                <label for="phone">
+                    Phone Number
+                </label>
+
+                <input
+    type="tel"
+    id="phone"
+    name="phone"
+    value="{{ phone }}"
+    required
+    maxlength="10"
+    inputmode="numeric"
+    placeholder="Enter 10-digit phone number"
+>
+<small class="field-error" id="phone-error"></small>
+
+    <div class="form-group">
+
+    <label for="service">
+        Service
+    </label>
+
+    <select
+        id="service"
+        name="service"
+        required
+    >
+
+        <option value="">
+            Select a service
+        </option>
+
+        {% for service in services %}
+
+            <option
+    value="{{ service.name }}"
+    {% if service.name == selected_service_name %}selected{% endif %}
+>
+    {{ service.name }} — ₹{{ "%.2f"|format(service.price) }}
+</option>
+
+        {% endfor %}
+
+    </select>
+    <small class="field-error" id="service-error"></small>
+
+</div>
+
+
+
+                <label for="date">
+                    Preferred Date
+                </label>
+
+                <input
+                    type="date"
+    id="date"
+    name="date"
+    value="{{ date }}"
+    required
+                >
+                <small class="field-error" id="date-error"></small>
+
+                <label for="time">
+                    Preferred Time
+                </label>
+
+                <input
+                    type="time"
+    id="time"
+    name="time"
+    value="{{ time }}"
+    required
+                >
+                <small class="field-error" id="time-error"></small>
+
+                <label for="message">
+                    Additional Message
+                </label>
+
+                <textarea
+    id="message"
+    name="message"
+    rows="5"
+    placeholder="Anything you'd like us to know?"
+>{{ message }}</textarea>
+
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    Submit Appointment Request
+                </button>
+
+            </form>
+
+        </section>
+
+    </main>
+
+
+    <footer>
+
+        <p>
+            &copy; 2026 GlowNest. All rights reserved.
+        </p>
+
+    </footer>
+
+    <script>
+const form = document.querySelector(".appointment-form");
+
+form.addEventListener("submit", function (event) {
+
+    let valid = true;
+
+    const fields = [
+        {
+            id: "name",
+            error: "name-error",
+            message: "Please enter your full name."
+        },
+        {
+            id: "email",
+            error: "email-error",
+            message: "Please enter a valid email address."
+        },
+        {
+            id: "phone",
+            error: "phone-error",
+            message: "Please enter a valid 10-digit phone number."
+        },
+        {
+            id: "service",
+            error: "service-error",
+            message: "Please select a service."
+        },
+        {
+            id: "date",
+            error: "date-error",
+            message: "Please select a preferred date."
+        },
+        {
+            id: "time",
+            error: "time-error",
+            message: "Please select a preferred time."
+        }
+    ];
+
+    fields.forEach(function (field) {
+
+        const input = document.getElementById(field.id);
+        const error = document.getElementById(field.error);
+
+        error.textContent = "";
+
+        if (!input.checkValidity()) {
+            error.textContent = field.message;
+            valid = false;
+        }
+
+    });
+
+    if (!valid) {
+        event.preventDefault();
+    }
+
+});
+
+const dateInput = document.getElementById("date");
+
+function setDateRestrictions() {
+
+    const today = new Date();
+
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+
+    const todayString = `${year}-${month}-${day}`;
+
+    dateInput.min = todayString;
+}
+
+setDateRestrictions();
+
+dateInput.addEventListener("change", function () {
+
+    if (!this.value) {
+        return;
+    }
+
+    const selectedDate = new Date(this.value + "T00:00:00");
+
+    // Sunday = 0
+    if (selectedDate.getDay() === 0) {
+
+        alert(
+            "GlowNest is closed on Sundays. Please select another date."
+        );
+
+        this.value = "";
+    }
+
+});
+</script>
+
+</body>
+
+</html>
