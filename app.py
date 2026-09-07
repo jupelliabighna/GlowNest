@@ -3,6 +3,8 @@ import os
 import re
 
 from dotenv import load_dotenv
+
+load_dotenv()
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_wtf.csrf import CSRFProtect, CSRFError
 from flask_sqlalchemy import SQLAlchemy
@@ -26,8 +28,11 @@ app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 # Session cookie security
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
-app.config["SESSION_COOKIE_SECURE"] = False
-
+app.config["SESSION_COOKIE_SECURE"] = os.getenv("SESSION_COOKIE_SECURE", "False").lower() == "true"
+app.config["RATELIMIT_STORAGE_URI"] = os.getenv(
+    "RATELIMIT_STORAGE_URI",
+    "memory://"
+)
 # Request size limits
 app.config["MAX_CONTENT_LENGTH"] = 1 * 1024 * 1024
 app.config["MAX_FORM_MEMORY_SIZE"] = 100 * 1024
@@ -38,7 +43,7 @@ csrf = CSRFProtect(app)
 limiter = Limiter(
     get_remote_address,
     app=app,
-    storage_uri="memory://"
+    storage_uri=app.config["RATELIMIT_STORAGE_URI"]
 )
 
 @app.after_request
