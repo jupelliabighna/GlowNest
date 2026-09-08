@@ -140,8 +140,8 @@ def load_user(user_id):
 with app.app_context():
     db.create_all()
 
-    admin_username = os.getenv("admin")
-    admin_password = os.getenv("GlowNest@123")
+    admin_username = os.getenv("ADMIN_USERNAME")
+    admin_password = os.getenv("ADMIN_PASSWORD")
 
     if admin_username and admin_password:
         existing_admin = Admin.query.filter_by(
