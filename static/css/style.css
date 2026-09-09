@@ -31,6 +31,14 @@ a {
     background: rgba(250, 247, 243, 0.95);
     border-bottom: 1px solid #e8dfd7;
 }
+.nav-container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 18px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
 
 
 .logo {
@@ -92,10 +100,8 @@ nav a:hover::after {
 
 .hero {
     min-height: 85vh;
-
     display: flex;
     align-items: center;
-
     padding: 80px 30px;
 
     background:
